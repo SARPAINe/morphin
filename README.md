@@ -83,6 +83,39 @@ REDIS_PORT=6379
    npm run dev
    ```
 
+### Local (with pm2)
+
+1. Install PM2 globally:
+
+   ```bash
+   npm install -g pm2
+   ```
+
+2. Start the server with PM2:
+
+   ```bash
+   pm2 start pm2.config.js
+   ```
+
+3. PM2 will manage the process and restart it if it crashes.
+4. To view logs:
+
+   ```bash
+   pm2 logs
+   ```
+
+5. To stop the server:
+
+   ```bash
+   pm2 stop all
+   ```
+
+6. To restart the server:
+
+   ```bash
+    pm2 restart all
+   ```
+
 ### With Docker Compose
 
 1. Build and start all services:
@@ -91,7 +124,7 @@ REDIS_PORT=6379
    docker compose up --build
    ```
 
-2. The API will be available at `http://localhost:4000` (via Nginx load balancer).
+2. The API will be available at `http://localhost:3000` (via Nginx load balancer).
 
 ---
 
