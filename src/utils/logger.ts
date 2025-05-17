@@ -3,16 +3,9 @@ import { createLogger, format, transports } from "winston";
 const logger = createLogger({
   level: "info",
   format: format.combine(
-    format.timestamp({
-      format: () =>
-        new Date().toLocaleString(undefined, {
-          timeZoneName: "short",
-          hour12: false,
-        }),
-    }),
-    format.printf(({ timestamp, level, message }) => {
-      return `${timestamp} [${level}]: ${message}`;
-    })
+    format.timestamp(),
+    format.errors({ stack: true }),
+    format.json()
   ),
   transports: [
     new transports.Console(),
@@ -21,14 +14,16 @@ const logger = createLogger({
   ],
 });
 
-export const logInfo = (message: string) => {
-  logger.info(message);
+export const logInfo = (message: string, meta: Record<string, any> = {}) => {
+  logger.info(message, meta);
 };
 
-export const logError = (message: string) => {
-  logger.error(message);
+export const logError = (message: string, meta: Record<string, any> = {}) => {
+  logger.error(message, meta);
 };
 
-export const logWarning = (message: string) => {
-  logger.warn(message);
+export const logWarning = (message: string, meta: Record<string, any> = {}) => {
+  logger.warn(message, meta);
 };
+
+export default logger;
