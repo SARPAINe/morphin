@@ -9,11 +9,15 @@ import cors from "cors";
 import helmet from "helmet";
 
 // Local module imports
-import { isAuth, errorHandler } from "./middlewares";
+import { errorHandler } from "./middlewares";
 import { authRoutes, employeeRoutes } from "./routes";
+import { defineAssociations } from "./models";
 
 // Initialize Express app
 const app = express();
+
+// Define associations between models
+defineAssociations();
 
 /**
  * --------------------------
