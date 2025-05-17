@@ -6,6 +6,6 @@ const router = Router();
 
 router.get("/", isAuth, employeeController.getAll);
 router.get("/:id", isAuth, employeeController.getById);
-router.get("/subordinates/:id", isAuth, employeeController.getSubordinates);
-router.get("/managers/:id", isAuth, employeeController.getManagers);
+router.get("/subordinates/:id", employeeController.getSubordinates);
+router.get("/managers/:id", employeeController.getManagers);
 export default router;

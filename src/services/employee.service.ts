@@ -1,6 +1,7 @@
 import Employee from "../models/employee.model";
 import { EmployeeClosure } from "../models";
 import { Op } from "sequelize";
+import redis from "../utils/cache";
 
 class EmployeeService {
   async getAll() {
@@ -14,9 +15,14 @@ class EmployeeService {
   }
 
   async getSubordinates(id: number) {
-    // Find all employees where the given id is the ancestor (excluding self)
+    const cacheKey = `employee:${id}:subordinates`;
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
     const closures = await EmployeeClosure.findAll({
-      where: { ancestor_id: id },
+      where: { ancestor_id: id, depth: { [Op.gt]: 0 } },
       include: [
         {
           model: Employee,
@@ -24,15 +30,23 @@ class EmployeeService {
           attributes: {
             exclude: ["password", "createdAt", "updatedAt"],
           },
-          order: [["depth", "ASC"]],
         },
       ],
+      order: [["depth", "ASC"]],
     });
-    return closures.map((c: any) => c.descendant);
+    const subordinates = closures.map((c: any) => c.descendant);
+
+    await redis.set(cacheKey, JSON.stringify(subordinates), "EX", 30);
+    return subordinates;
   }
 
   async getManagers(id: number) {
-    // Find all employees where the given id is the descendant (excluding self)
+    const cacheKey = `employee:${id}:managers`;
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
     const closures = await EmployeeClosure.findAll({
       where: { descendant_id: id, depth: { [Op.gt]: 0 } },
       include: [
@@ -42,11 +56,14 @@ class EmployeeService {
           attributes: {
             exclude: ["password", "createdAt", "updatedAt"],
           },
-          order: [["depth", "ASC"]],
         },
       ],
+      order: [["depth", "ASC"]],
     });
-    return closures.map((c: any) => c.ancestor);
+    const managers = closures.map((c: any) => c.ancestor);
+
+    await redis.set(cacheKey, JSON.stringify(managers), "EX", 30);
+    return managers;
   }
 }
 
