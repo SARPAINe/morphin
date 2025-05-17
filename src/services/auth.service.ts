@@ -37,42 +37,54 @@ class AuthService {
     role: EmployeeRole,
     parent_id?: number
   ) {
-    this.validateCredentials(email, password);
-    await this.checkExistingEmployee(email);
-    const hashedPassword = await this.hashPassword(password);
-    const employee = await Employee.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      parent_id,
-    });
+    const transaction = await Employee.sequelize!.transaction();
+    try {
+      this.validateCredentials(email, password);
+      await this.checkExistingEmployee(email);
+      const hashedPassword = await this.hashPassword(password);
 
-    // Insert into employees_closure
-    await EmployeeClosure.create({
-      ancestor_id: employee.id,
-      descendant_id: employee.id,
-      depth: 0,
-    });
+      const employee = await Employee.create(
+        {
+          name,
+          email,
+          password: hashedPassword,
+          role,
+          parent_id,
+        },
+        { transaction }
+      );
 
-    if (parent_id) {
-      const parentClosures = await EmployeeClosure.findAll({
-        //need to decide if descendant_id need to be indexed
-        where: { descendant_id: parent_id },
-      });
-      // console.log("🚀 ~ AuthService ~ parentClosures:", parentClosures);
+      await EmployeeClosure.create(
+        {
+          ancestor_id: employee.id,
+          descendant_id: employee.id,
+          depth: 0,
+        },
+        { transaction }
+      );
 
-      const insertions = parentClosures.map((closure) => ({
-        ancestor_id: closure.ancestor_id,
-        descendant_id: employee.id,
-        depth: closure.depth + 1,
-      }));
+      if (parent_id) {
+        const parentClosures = await EmployeeClosure.findAll({
+          where: { descendant_id: parent_id },
+          transaction,
+        });
 
-      await EmployeeClosure.bulkCreate(insertions);
+        const insertions = parentClosures.map((closure) => ({
+          ancestor_id: closure.ancestor_id,
+          descendant_id: employee.id,
+          depth: closure.depth + 1,
+        }));
+
+        await EmployeeClosure.bulkCreate(insertions, { transaction });
+      }
+
+      await transaction.commit();
+      delete employee.dataValues.password;
+      return employee;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
     }
-
-    delete employee.dataValues.password;
-    return employee;
   }
 
   public async login(email: string, password: string) {
