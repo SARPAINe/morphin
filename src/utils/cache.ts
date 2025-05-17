@@ -1,6 +1,9 @@
-import NodeCache from "node-cache";
+import Redis from "ioredis";
+console.log(process.env.REDIS_HOST);
+console.log(process.env.REDIS_PORT);
+const redis = new Redis({
+  host: process.env.REDIS_HOST || "localhost",
+  port: Number(process.env.REDIS_PORT) || 6379,
+});
 
-// cache time in seconds, e.g., 60 seconds
-const cache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
-
-export default cache;
+export default redis;
