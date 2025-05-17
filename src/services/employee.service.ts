@@ -2,6 +2,7 @@ import Employee from "../models/employee.model";
 import { EmployeeClosure } from "../models";
 import { Op } from "sequelize";
 import redis from "../utils/cache";
+import { ApiError } from "../utils";
 
 class EmployeeService {
   async getAll() {
@@ -10,7 +11,7 @@ class EmployeeService {
 
   async getById(id: number) {
     const employee = await Employee.findByPk(id);
-    if (!employee) throw new Error("Employee not found");
+    if (!employee) throw new ApiError("Employee not found", 404);
     return employee;
   }
 
