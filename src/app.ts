@@ -10,7 +10,7 @@ import helmet from "helmet";
 
 // Local module imports
 import { isAuth, errorHandler } from "./middlewares";
-import { authRoutes } from "./routes";
+import { authRoutes, employeeRoutes } from "./routes";
 
 // Initialize Express app
 const app = express();
@@ -70,6 +70,7 @@ app.get("/", (_req, res) => {
 
 // Authentication routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/employees", employeeRoutes);
 
 // Text-related routes with authentication middleware
 // app.use("/api/v1/subordinates", isAuth);

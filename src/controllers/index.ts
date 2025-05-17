@@ -1,2 +1,3 @@
 import { authController } from "./auth.controller";
-export { authController };
+import { employeeController } from "./employee.controller";
+export { authController, employeeController };
