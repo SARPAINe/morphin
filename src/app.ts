@@ -50,6 +50,7 @@ const limiter = rateLimit({
 });
 
 // Only apply rate limiter in production
+// Need to comment out for load testing
 if (process.env.NODE_ENV === "production") {
   app.use(limiter);
 }
