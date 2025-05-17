@@ -44,19 +44,15 @@ app.use(urlencoded({ extended: true }));
 
 // Rate Limiting Configuration
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: "draft-8", // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false,
-  handler: (_req, res) => {
-    res
-      .status(429)
-      .json({ message: "Too many requests, please try again later." });
-  },
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again later.",
 });
 
-// Apply the rate limiting middleware globally
-app.use(limiter);
+// Only apply rate limiter in production
+if (process.env.NODE_ENV === "production") {
+  app.use(limiter);
+}
 
 // Initialize Passport.js for authentication
 app.use(passport.initialize());
@@ -69,7 +65,9 @@ app.use(passport.initialize());
 
 // Basic route for root path
 app.get("/", (_req, res) => {
-  res.send("Welcome to the MORFIN API!");
+  res.sendFile("index.html", {
+    root: `${__dirname}/public`,
+  });
 });
 
 // Authentication routes
