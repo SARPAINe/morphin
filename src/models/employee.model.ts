@@ -4,7 +4,7 @@ import { EmployeeRole } from "../enums/employeeRole.enum";
 
 class Employee extends Model {
   public id!: number;
-  public parentId!: number;
+  public parent_id!: number;
   public name!: string;
   public email!: string;
   public password!: string;
@@ -32,7 +32,7 @@ Employee.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    parentId: {
+    parent_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {

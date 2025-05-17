@@ -45,3 +45,4 @@ coverage/
 *.bak
 *.orig
 test_output.txt
+clearDatabase.ts

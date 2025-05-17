@@ -1,7 +1,7 @@
 // src/database.ts
 import { Sequelize } from "sequelize";
-// import dotenv from "dotenv";
-// dotenv.config();
+import dotenv from "dotenv";
+dotenv.config();
 
 // Initialize a Sequelize instance with PostgreSQL database connection
 export const sequelize = new Sequelize({

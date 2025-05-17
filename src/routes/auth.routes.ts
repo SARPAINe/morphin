@@ -17,6 +17,7 @@ const registerSchema = loginSchema.keys({
     .valid(...Object.values(EmployeeRole))
     .required()
     .label("Role"),
+  parent_id: Joi.number().allow(null).label("Parent ID"),
 });
 
 router.post("/register", validate(registerSchema), authController.register);

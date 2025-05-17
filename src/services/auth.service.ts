@@ -40,12 +40,12 @@ class AuthService {
     this.validateCredentials(email, password);
     await this.checkExistingEmployee(email);
     const hashedPassword = await this.hashPassword(password);
-    // return await Employee.create({ email, password: hashedPassword, name });
     const employee = await Employee.create({
       name,
       email,
       password: hashedPassword,
       role,
+      parent_id,
     });
 
     // Insert into employees_closure
@@ -57,8 +57,10 @@ class AuthService {
 
     if (parent_id) {
       const parentClosures = await EmployeeClosure.findAll({
+        //need to decide if descendant_id need to be indexed
         where: { descendant_id: parent_id },
       });
+      // console.log("🚀 ~ AuthService ~ parentClosures:", parentClosures);
 
       const insertions = parentClosures.map((closure) => ({
         ancestor_id: closure.ancestor_id,
@@ -68,8 +70,8 @@ class AuthService {
 
       await EmployeeClosure.bulkCreate(insertions);
     }
-    delete employee.dataValues.password;
 
+    delete employee.dataValues.password;
     return employee;
   }
 
