@@ -1,5 +1,5 @@
 # Use Node.js base image
-FROM node:alpine
+FROM node:22
 
 # Set working directory inside container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Expose the port your app runs on (change if different)
-EXPOSE 3000
+EXPOSE 4000
 
 # Command to run your app
 CMD ["npm", "run", "start"]
