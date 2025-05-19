@@ -4,7 +4,7 @@ import { sleep, check } from "k6";
 // Load test options
 export const options = {
   vus: 10000, // number of concurrent virtual users
-  duration: "60s", // total test duration
+  duration: "40s", // total test duration
   thresholds: {
     http_req_duration: ["p(95)<500"], // 95% of requests under 500ms
   },
